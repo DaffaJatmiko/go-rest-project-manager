@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: mysqldatabase123
+      MYSQL_DATABASE: goprojectmanager
+    ports:
+      - '3307:3306'
+    networks:
+      - go-rest-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-rest-project-manager
+    environment:
+      PORT: 3000
+      DB_USER: root
+      DB_PASSWORD: mysqldatabase123
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: goprojectmanager
+      JWT_SECRET: randomjwtsecret
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mysql
+    restart: on-failure
+    networks:
+      - go-rest-network
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - '8081:8080'
+    networks:
+      - go-rest-network
+
+networks:
+  go-rest-network:
